@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen</title>
+    <style>
+        .transp {
+            background-color: lightgoldenrodyellow;
+            width: 800px;
+            height: 800px;
+            display: block;
+            margin-top: 5rem;
+            position: absolute;
+            top: 0px;
+            left: 35rem;
+            z-index: 2;            
+        }
+
+        .inicio {
+            padding: 0.7rem;
+            border: 2px solid blue;
+            color: white;
+            background-color: lightskyblue;
+            border-radius: 1rem;
+            font-size: 1rem;            
+            margin-left: 350px;
+            margin-top: 350px;
+        }
+
+        .contenedor {
+            background-color: lightgrey;
+            width: 800px;
+            height: 800px;
+            display: block;
+            margin-top: 5rem;
+            position: absolute;
+            top: 0px;
+            left: 35rem;
+            z-index: 1;
+        }
+        .comprueba {
+            padding: 0.7rem;
+            border: 2px solid blue;
+            color: white;
+            background-color: lightskyblue;
+            border-radius: 1rem;
+            font-size: 1rem;
+            margin-left: 1rem;
+        } 
+
+        .intra {            
+          margin-top: 16rem;  
+          font-family: sans-serif;
+        }      
+       
+        h2 {
+            margin-top: 1rem;           
+            font-family: monospace;
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin-left: 0.6rem;
+        }
+
+        .salida {
+            margin-left: 6rem; 
+        }
+
+        .salida span {
+            border: 1px solid;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 2rem;
+            padding: 1rem;
+            margin: 0.5rem;
+            margin-top: 1rem;
+            margin-left: 1rem;
+            text-transform: uppercase;
+        }
+
+        .letra {
+            font-weight: bold;
+        }
+
+        .letra,
+        .comprueba {
+            margin-top: 2rem;
+            margin-left: 1rem;
+        }
+
+        #letra {
+            margin-top: 2rem;
+            margin-left: 1rem;
+        }
+
+        .pizarra p {
+            font-weight: bold;
+            margin-left: 1rem;
+            font-family: sans-serif;
+        }
+
+        .pizarra span {
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 2rem;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            margin-top: 2rem;
+            margin-left: 1rem;
+            text-transform: uppercase;
+            color: darkred;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="transp">
+        <button class="inicio">Iniciar</button>
+    </div>
+    <div class="contenedor">
+        <div class="intra">
+            <h2>Encuentra la palabra oculta</h2>
+            <p class="salida"></p>            
+            <label for="letra" class="letra">Introduce una letra</label>
+            <input type="text" name="letra" id="letra" maxlength="1">
+            <button class="comprueba">Comprobar</button>
+               
+            <div class="pizarra">
+                <p>Errores:<p class="l_errores"></p></p>
+                <p>Nº Errores:<p class ="n_errores"></p></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let palabra = "";
+        let palabra_limpia = "";
+        let intentos = "";
+        let n_intentos = "";
+        let errores = 0;
+        let falladas = "";
+        let encontradas = "";
+        let num_encontradas = 0;
+
+        function iniciaJuego() {
+            palabra = "";
+            palabra_limpia = "";
+            intentos = ""
+            n_intentos = "";
+            errores = 0;
+            n_errores = "";
+            falladas = "";
+            encontradas = "";
+            num_encontradas = 0;
+
+            palabra = prompt('Porporciona una palabra para jugar');
+            intentos = prompt('Dime número de intentos');
+            n_intentos = parseInt(intentos.value);
+
+            let cuadrito = "";           
+            for (let i = 0; i < palabra.length; i++) {
+                cuadrito += "<span>-</span>";
+            }             
+            document.querySelector(".transp").style.display = "none";
+            document.querySelector(".salida").innerHTML = cuadrito;
+            limpiaPalabra(palabra);            
+           
+            document.querySelector("#letra").value = "";
+            document.querySelector("#letra").focus();
+
+            console.log(palabra);
+        }       
+
+        function compruebaLetra() {
+            let letra = document.querySelector("#letra").value;
+            if (!isNaN(parseInt(letra))) {
+                alert("Dato no válido");
+            } else {
+                if (letra == "") {
+                    alert("Dato no válido");
+                } else {
+                    letra = cambiaTilde(letra);
+                    if (palabra_limpia.indexOf(letra) != -1) {
+                        muestraLetra(letra);
+                    } else {
+                        controlErrores(letra);
+                    }
+                }                 
+            } 
+            document.querySelector("#letra").value = "";
+            document.querySelector("#letra").focus();
+        }
+
+        function cambiaTilde(letra) {
+            letra = letra.toLowerCase();
+            let letra_s = '';
+            switch (letra) {
+                case 'á':
+                case 'à':
+                    letra_s = 'a';
+                    break;
+                case 'é':
+                case 'è':
+                    letra_s = 'e';
+                    break;
+                case 'í':
+                case 'ì':
+                    letra_s = 'i';
+                    break;
+                case 'ó':
+                case 'ò':
+                    letra_s = 'o';
+                    break;
+                case 'ú':
+                case 'ù':
+                case 'ü':
+                    letra_s = 'u';
+                    break;
+                default:
+                    letra_s = letra;
+                    break;
+            }
+            return letra_s;
+        }
+
+        function limpiaPalabra(frase) {
+            for (i = 0; i < frase.length; i++) {
+                palabra_limpia += cambiaTilde(frase[i]);
+            }
+        }
+        
+        function controlErrores(letra) {
+            if (falladas.indexOf(letra) != -1) {
+                alert("¡Esta letra ya la habías dicho!")
+            } else {                
+                errores++;     
+                n_intentos--;          
+                falladas += letra;
+                document.querySelector(".l_errores").innerHTML += "<span>" + letra + "</span>";
+                document.querySelector(".n_errores").innerHTML += "<span>" + errores + "</span>";
+                if (errores == n_intentos) {
+                    alert("Lo siento, no has acertado.\nMás suerte la próxima vez");
+                    alert("Loser!");
+                    rePlay();
+                }
+            }
+        }        
+
+        function muestraLetra(caracter) {
+            if (encontradas.indexOf(caracter) != -1) {
+                alert("¡Esta letra ya la habías dicho!");
+            } else {
+                encontradas += caracter; 
+                let conjunto_span = document.querySelectorAll(".salida span");
+                for (i = 0; i < palabra_limpia.length; i++) {                    
+                    if (palabra_limpia[i] == caracter) {                       
+                        conjunto_span[i].textContent = palabra[i];
+                        num_encontradas++;
+                        if (num_encontradas == palabra.length) {
+                            finJuego();                            
+                        }
+                    }                        
+                    // } else if (palabra_limpia[i] == " ") {
+                    //     conjunto_span[i].style.color = "red";
+                    // } else {}
+                }
+            }
+        }
+        
+        function finJuego() {          
+            alert("¡Enhorabuena!\n¡Has ganado!"); 
+            rePlay();                   
+        }
+
+        function rePlay() {          
+            let opcion = confirm("Clika en Aceptar o Cancelar");
+            if (opcion == true) {
+                alert("¡Vamos, que nos vamos!\n :D");
+                iniciaJuego();
+                document.querySelector(".l_errores").innerHTML = "";
+                document.querySelector(".n_errores").innerHTML = "";               
+            } else {
+                alert("¿Ya te vas?\n :("); 
+                document.body.innerHTML = "";
+            }   
+            console.log(".pizarra");                                  
+        }     
+        
+        document.querySelector(".inicio").onclick = iniciaJuego;
+        document.querySelector(".comprueba").onclick = compruebaLetra;
+    </script>
+
+</body>
+</html>
